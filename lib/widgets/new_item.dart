@@ -27,7 +27,13 @@ class _NewItem extends State<NewItem> {
                   label: Text('Name'),
                 ),
                 validator: (value) {
-                  return;
+                  if (value == null ||
+                      value.isEmpty ||
+                      value.trim().length <= 1 ||
+                      value.trim().length > 50) {
+                    return 'Must be between 1 to 50 character.';
+                  }
+                  return null;
                 },
               ),
               Row(
@@ -39,6 +45,15 @@ class _NewItem extends State<NewItem> {
                         label: Text('Quantity'),
                       ),
                       initialValue: '1',
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            int.tryParse(value) == null ||
+                            int.tryParse(value)! <= 0) {
+                          return 'Must be a valid positive number.';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(
@@ -78,7 +93,7 @@ class _NewItem extends State<NewItem> {
                   ),
                   ElevatedButton(
                       onPressed: () {}, child: const Text('Add Item'))
-                ],
+                ], // Do something when we press them!
               )
             ],
           ),
