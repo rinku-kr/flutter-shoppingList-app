@@ -12,6 +12,16 @@ class NewItem extends StatefulWidget {
 }
 
 class _NewItem extends State<NewItem> {
+  final _formkey = GlobalKey<FormState>();
+
+  void _saveItem() {
+    _formkey.currentState!.validate();
+  }
+
+  void _resetItem() {
+    _formkey.currentState!.reset();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,6 +29,7 @@ class _NewItem extends State<NewItem> {
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Form(
+          key: _formkey,
           child: Column(
             children: [
               TextFormField(
@@ -44,6 +55,7 @@ class _NewItem extends State<NewItem> {
                       decoration: const InputDecoration(
                         label: Text('Quantity'),
                       ),
+                      keyboardType: TextInputType.number,
                       initialValue: '1',
                       validator: (value) {
                         if (value == null ||
@@ -87,12 +99,12 @@ class _NewItem extends State<NewItem> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: () {}, child: const Text('Reset')),
+                  TextButton(onPressed: _resetItem, child: const Text('Reset')),
                   const SizedBox(
                     width: 8,
                   ),
                   ElevatedButton(
-                      onPressed: () {}, child: const Text('Add Item'))
+                      onPressed: _saveItem, child: const Text('Add Item'))
                 ], // Do something when we press them!
               )
             ],
