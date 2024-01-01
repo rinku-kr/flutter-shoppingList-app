@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
 import 'package:shopping_list/models/grocery_item.dart';
-// import 'package:shopping_list/models/grocery_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -23,11 +22,14 @@ class _NewItem extends State<NewItem> {
   var _enteredName = '';
   var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.fruit]!;
+  var _isSending = false;
 
   void _saveItem() async {
     if (_formkey.currentState!.validate()) {
       _formkey.currentState!.save();
-
+      setState(() {
+        _isSending = true;
+      });
       final url = Uri.https('flutter-app-767e4-default-rtdb.firebaseio.com',
           'shopping_list.json');
       final response = await http.post(url,
@@ -147,12 +149,21 @@ class _NewItem extends State<NewItem> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: _resetItem, child: const Text('Reset')),
+                  TextButton(
+                      onPressed: _isSending ? null : _resetItem,
+                      child: const Text('Reset')),
                   const SizedBox(
                     width: 8,
                   ),
                   ElevatedButton(
-                      onPressed: _saveItem, child: const Text('Add Item'))
+                      onPressed: _isSending ? null : _saveItem,
+                      child: _isSending
+                          ? const SizedBox(
+                              height: 15,
+                              width: 18,
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Text('Add Item'))
                 ], // Do something when we press them!
               )
             ],
