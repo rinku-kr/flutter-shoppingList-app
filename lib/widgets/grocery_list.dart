@@ -29,40 +29,47 @@ class _GroceryListState extends State<GroceryList> {
   void _loadItems() async {
     final url = Uri.https(
         'flutter-app-767e4-default-rtdb.firebaseio.com', 'shopping_list.json');
-    final response = await http.get(url);
-    if (response.statusCode >= 400) {
-      setState(() {
-        _error = 'Failed to fetch data. please try again later.';
-      });
-    }
 
-    // print(response.body);
-    if (response.body == 'null') {
+    try {
+      final response = await http.get(url);
+      if (response.statusCode >= 400) {
+        setState(() {
+          _error = 'Failed to fetch data. please try again later.';
+        });
+      }
+
+      // print(response.body);
+      if (response.body == 'null') {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+      final Map<String, dynamic> listData = json.decode(response.body);
+      final List<GroceryItem> loadedItems = [];
+      for (final item in listData.entries) {
+        final category = categories.entries
+            .firstWhere(
+                (catItem) => catItem.value.title == item.value['category'])
+            .value;
+        loadedItems.add(
+          GroceryItem(
+            id: item.key,
+            name: item.value['name'],
+            quantity: item.value['quantity'],
+            category: category,
+          ),
+        );
+      }
       setState(() {
+        _groceryItems = loadedItems;
         _isLoading = false;
       });
-      return;
+    } catch (error) {
+      setState(() {
+        _error = 'Something went wrong. try again later.';
+      });
     }
-    final Map<String, dynamic> listData = json.decode(response.body);
-    final List<GroceryItem> loadedItems = [];
-    for (final item in listData.entries) {
-      final category = categories.entries
-          .firstWhere(
-              (catItem) => catItem.value.title == item.value['category'])
-          .value;
-      loadedItems.add(
-        GroceryItem(
-          id: item.key,
-          name: item.value['name'],
-          quantity: item.value['quantity'],
-          category: category,
-        ),
-      );
-    }
-    setState(() {
-      _groceryItems = loadedItems;
-      _isLoading = false;
-    });
   }
 
 // {"-Nn2KVSog4dKugBrcB-7":{"category":"Dairy","name":"protein","quantity":5}}
